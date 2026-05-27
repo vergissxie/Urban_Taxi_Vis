@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+venv/
+.pytest_cache/
+
+# Env files
+.env
+backend/.env
+
+# VS Code
+.vscode/
+.vscode/*.log
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local tooling / planning notes
+.claude/
+.codegraph/
+task_plan.md
+progress.md
+findings.md
+
+# Large local data and generated outputs
+data/
+data/raw/
+data/processed/
+data/final/
+data/*.pbf
+final_submission/

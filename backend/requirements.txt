@@ -1,0 +1,13 @@
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+sqlalchemy==2.0.43
+psycopg2-binary==2.9.10
+geoalchemy2==0.18.0
+pydantic-settings==2.10.1
+redis==6.4.0
+h3==4.1.2
+pandas==2.3.2
+geopandas==1.1.1
+pyrosm==0.6.2
+leuvenmapmatching==1.1.4
+python-dotenv==1.1.1

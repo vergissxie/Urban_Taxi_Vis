@@ -1,0 +1,9 @@
+# Dependencies required by the standalone data_scripts pipeline.
+# The backend Docker image already installs these via backend/requirements.txt;
+# this file is for teachers or reviewers who run data_scripts separately.
+numpy>=1.26
+pandas==2.3.2
+SQLAlchemy==2.0.43
+psycopg2-binary==2.9.10
+geopandas==1.1.1
+pyrosm==0.6.2

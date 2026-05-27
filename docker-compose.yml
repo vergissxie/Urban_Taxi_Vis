@@ -1,0 +1,87 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taxi-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgis:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    cpus: "${BACKEND_CPUS:-6.0}"
+    mem_limit: "${BACKEND_MEM_LIMIT:-8g}"
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - ./backend/app:/app/app
+      - ./docs:/app/docs:ro
+      - ./README.md:/app/README.md:ro
+      - ./data_scripts:/app/data_scripts
+      - ./data:/app/data
+      - ./data/raw/taxi_log_2008_by_id:/app/taxi_log_2008_by_id
+      - ./data/processed/cleaned_data:/app/cleaned_data
+    depends_on:
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: taxi-postgis
+    restart: unless-stopped
+    command:
+      - postgres
+      - -c
+      - shared_buffers=${POSTGIS_SHARED_BUFFERS:-1GB}
+      - -c
+      - work_mem=${POSTGIS_WORK_MEM:-64MB}
+      - -c
+      - maintenance_work_mem=${POSTGIS_MAINTENANCE_WORK_MEM:-512MB}
+      - -c
+      - effective_cache_size=${POSTGIS_EFFECTIVE_CACHE_SIZE:-4GB}
+      - -c
+      - max_wal_size=${POSTGIS_MAX_WAL_SIZE:-2GB}
+      - -c
+      - checkpoint_completion_target=${POSTGIS_CHECKPOINT_COMPLETION_TARGET:-0.9}
+    cpus: "${POSTGIS_CPUS:-6.0}"
+    mem_limit: "${POSTGIS_MEM_LIMIT:-8g}"
+    shm_size: "${POSTGIS_SHM_SIZE:-1g}"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
+  redis:
+    image: redis:7-alpine
+    container_name: taxi-redis
+    restart: unless-stopped
+    cpus: "${REDIS_CPUS:-1.0}"
+    mem_limit: "${REDIS_MEM_LIMIT:-1g}"
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
+volumes:
+  postgis_data:
+  redis_data:
