@@ -12,6 +12,24 @@ Urban Taxi Vis 是一个面向北京出租车 GPS 数据的轨迹分析与可视
 - [系统架构](./docs/architecture.md)
 - [数据处理流程](./docs/data-pipeline.md)
 
+## 界面预览
+
+### 数据概览
+
+![数据概览](./docs/media/preview-overview.jpg)
+
+### 轨迹查询与地图匹配
+
+![轨迹查询与地图匹配](./docs/media/preview-trajectory.jpg)
+
+### 区域与网格分析
+
+![区域与网格分析](./docs/media/preview-spatial-analysis.jpg)
+
+### 高频路线挖掘与策略推荐
+
+![高频路线挖掘与策略推荐](./docs/media/preview-route-mining.jpg)
+
 ## 功能范围
 
 | 编号 | 功能 |
