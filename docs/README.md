@@ -18,7 +18,6 @@ flowchart LR
   R --> DEV["03-developer-guide<br/>接口、配置、数据库"]
   R --> ARCH["04-architecture<br/>详细架构与流程"]
   R --> T["05-technical-notes<br/>算法与代码逻辑"]
-  R --> FINAL["../final<br/>??????"]
 ```
 
 ## 顶层文档用途
@@ -46,10 +45,11 @@ docs/
 ├─ 03-developer-guide/    # 配置、构建运行、API、数据库、目录结构
 ├─ 04-architecture/       # 更详细的系统架构、核心流程、模块设计
 ├─ 05-technical-notes/    # PostGIS、RAG、F1-F9 后端代码逻辑、依赖链
-└─ assets/                # 截图、图示和演示素材
+├─ media/                 # 演示视频等媒体文件
+└─ user_guide.pdf         # 用户指南 PDF
 ```
 
-最终交付材料放在仓库根目录的 `final/`，包括报告、PPT、演示视频等。
+演示视频位于 [media/demo-video.mp4](./media/demo-video.mp4)，用户指南 PDF 位于 [user_guide.pdf](./user_guide.pdf)。
 
 ## 推荐阅读顺序
 
@@ -58,7 +58,7 @@ docs/
 | 1. 快速了解 | [项目介绍](./01-overview/project-introduction.md)、[功能说明](./feature-guide.md) | 先知道系统解决什么问题，以及 F1-F9 分别做什么。 |
 | 2. 本地运行 | [快速启动](./getting-started.md)、[Demo 说明](./demo-submission.md) | 根据是否有后端和数据库选择只读 Demo、mock Demo 或完整模式。 |
 | 3. 功能演示 | [功能说明](./feature-guide.md)、[用户操作说明](./02-user-guide/user-manual.md) | 按轨迹、区域网格、路径挖掘三组组织答辩演示。 |
-| 4. 技术答辩 | [架构说明](./architecture.md)、[数据流程](./data-pipeline.md)、[F1-F9 后端代码逻辑](./05-technical-notes/f1-f9-code-logic.md) | 解释接口、表结构、算法、缓存、性能优化和限制。 |
+| 4. 技术答辩 | [架构说明](./architecture.md)、[数据流程](./data-pipeline.md)、[技术说明总览](./05-technical-notes/README.md) | 解释接口、表结构、算法、缓存、性能优化和限制。 |
 
 ## 当前真实代码口径
 
@@ -86,7 +86,7 @@ docs/
 
 ## 维护规则
 
-- 修改 F1-F9 实现后，至少同步更新 [feature-guide.md](./feature-guide.md) 和 [F1-F9 后端代码逻辑](./05-technical-notes/f1-f9-code-logic.md)。
+- 修改 F1-F9 实现后，至少同步更新 [feature-guide.md](./feature-guide.md) 和 [技术说明总览](./05-technical-notes/README.md)。
 - 修改接口路径、参数或返回字段后，同步更新 [API 接口说明](./03-developer-guide/api-reference.md)。
 - 修改数据表、索引、缓存脚本后，同步更新 [data-pipeline.md](./data-pipeline.md) 和 [数据库设计说明](./03-developer-guide/database-design.md)。
 - 修改 Demo 行为、环境变量或提交方式后，同步更新 [demo-submission.md](./demo-submission.md)。
