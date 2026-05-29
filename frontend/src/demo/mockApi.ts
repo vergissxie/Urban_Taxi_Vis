@@ -59,36 +59,88 @@ const f8RouteB: LngLat[] = [
   [116.338, 39.897], [116.356, 39.902], [116.373, 39.908], [116.394, 39.914], [116.416, 39.925], [116.438, 39.934],
 ];
 
-const ragChunks = [
-  {
-    title: '项目功能说明',
-    path: 'docs/01-overview/feature-list.md',
-    heading: 'F1-F9 功能范围',
-    keywords: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', '功能', '轨迹', '网格', 'od', '路径'],
-    content: 'F1-F9 covers trajectory query/simplification, region selection, grid density, A/B OD flow, core-area radiation, frequent roads, A/B frequent routes, and strategy-based route recommendation.',
-  },
-  {
-    title: '技术架构说明',
-    path: 'docs/04-architecture/system-architecture.md',
-    heading: '前后端分离架构',
-    keywords: ['架构', '前端', '后端', 'fastapi', 'postgis', 'redis', 'react', 'vite'],
-    content: '前端使用 Vite、React、TypeScript、Ant Design 和高德地图 JavaScript API；完整模式下由 FastAPI 提供轨迹和分析接口，PostgreSQL/PostGIS 存储空间数据，Redis 用于缓存。',
-  },
-  {
-    title: '算法说明',
-    path: 'docs/05-technical-notes/selected-technology.md',
-    heading: '空间分析与路径挖掘',
-    keywords: ['算法', 'h3', '网格', '密度', '路径', '路网', 'map matching', '频繁'],
-    content: 'F4 aggregates trajectory points into lon/lat grid cells. F7/F8 mine road-match segments, path signatures and representative routes. F9 recommends from F8 candidates by p50, p90, or frequency-duration score.',
-  },
-  {
-    title: '演示部署说明',
-    path: 'docs/demo-submission.md',
-    heading: 'Demo 模式',
-    keywords: ['demo', '演示', '提交', '老师', 'key', '密钥', 'rag', 'ai'],
-    content: 'Demo 模式不连接真实后端数据，浏览器内置一组脱敏样例响应和项目知识库检索。老师可直接查看固定数据，也可在配置后端和大模型 Key 后切换到完整模式。',
-  },
-];
+type RagChunk = {
+  title: string;
+  path: string;
+  heading: string;
+  keywords: string[];
+  content: string;
+};
+
+const markdownModules = {
+  '../../../README.md': '',
+  ...import.meta.glob('../../../docs/**/*.md', { query: '?raw', import: 'default', eager: true }),
+  ...import.meta.glob('../../../README.md', { query: '?raw', import: 'default', eager: true }),
+} as Record<string, string>;
+
+function normalizeDemoDocPath(path: string) {
+  return path.replace(/^\.\.\/\.\.\/\.\.\//, '');
+}
+
+function cleanMarkdownForDemoRag(markdown: string) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+    .replace(/[#>*_`|~-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isProbablyCorruptedText(text: string) {
+  const questionMarks = (text.match(/\?/g) || []).length;
+  const replacementChars = (text.match(/\uFFFD/g) || []).length;
+  return replacementChars > 0 || questionMarks >= 8 || /\?{4,}/.test(text);
+}
+
+function titleFromMarkdown(path: string, markdown: string) {
+  const firstHeading = markdown.match(/^#\s+(.+)$/m)?.[1]?.trim();
+  if (firstHeading) return firstHeading;
+  return path.split('/').pop()?.replace(/\.md$/i, '') || path;
+}
+
+function splitDemoMarkdownDoc(path: string, markdown: string): RagChunk[] {
+  const relativePath = normalizeDemoDocPath(path);
+  const title = titleFromMarkdown(relativePath, markdown);
+  const lines = markdown.split(/\r?\n/);
+  const chunks: RagChunk[] = [];
+  let currentHeading = title;
+  let buffer: string[] = [];
+
+  const flush = () => {
+    const content = cleanMarkdownForDemoRag(buffer.join('\n'));
+    buffer = [];
+    if (!content || isProbablyCorruptedText(`${currentHeading} ${content}`)) return;
+    const contentParts = content.match(/.{1,1600}(?:\s|$)/g) || [content];
+    contentParts.forEach((part, index) => {
+      const heading = index === 0 ? currentHeading : `${currentHeading}（续）`;
+      chunks.push({
+        title,
+        path: relativePath,
+        heading,
+        keywords: Array.from(new Set(tokenize(`${title} ${relativePath} ${heading} ${part}`))).slice(0, 80),
+        content: part.trim(),
+      });
+    });
+  };
+
+  lines.forEach((line) => {
+    const heading = line.match(/^(#{1,4})\s+(.+)$/);
+    if (heading) {
+      flush();
+      currentHeading = heading[2].trim();
+      buffer.push(line);
+      return;
+    }
+    buffer.push(line);
+  });
+  flush();
+  return chunks;
+}
+
+const ragChunks: RagChunk[] = Object.entries(markdownModules)
+  .flatMap(([path, markdown]) => splitDemoMarkdownDoc(path, String(markdown || '')))
+  .filter((chunk) => (chunk.path === 'README.md' || chunk.path.startsWith('docs/')) && !isProbablyCorruptedText(`${chunk.heading} ${chunk.content}`));
 
 function sleep(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -499,7 +551,9 @@ function demoAssistant(body: Record<string, any>) {
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, Math.max(1, Math.min(5, Number(body.top_k || body.topK || 3))));
-  const hits = scored.length ? scored : [{ chunk: ragChunks[0], score: 1 }, { chunk: ragChunks[3], score: 1 }];
+  const hits = scored.length
+    ? scored
+    : ragChunks.slice(0, 2).map((chunk) => ({ chunk, score: 1 }));
   const sources = hits.map(({ chunk, score }) => ({ title: chunk.title, path: chunk.path, heading: chunk.heading, score }));
   const contextLine = body.context?.activeFeature ? `当前界面上下文是 ${body.context.activeFeature}。` : '当前为课程作业 Demo 模式。';
   const answer = [
