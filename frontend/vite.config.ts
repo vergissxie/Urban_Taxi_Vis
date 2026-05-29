@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   envDir: '..',
+  base: process.env.GITHUB_PAGES === 'true' ? '/Urban_Taxi_Vis/' : '/',
   plugins: [react(), tailwindcss()],
   server: {
     host: 'localhost',
