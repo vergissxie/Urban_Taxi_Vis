@@ -4,6 +4,7 @@ Urban Taxi Vis 是一个面向北京出租车 GPS 数据的轨迹分析与可视
 
 ## 快速入口
 
+- [在线 Demo 模式（GitHub Pages）](https://vergissxie.github.io/Urban_Taxi_Vis/)
 - [观看完整前端演示视频](./docs/media/demo-video.mp4)
 - [下载原始数据包](https://github.com/vergissxie/Urban_Taxi_Vis/releases/download/v1.0.0/urban-taxi-vis-raw-data.zip)
 - [文档总览](./docs/README.md)
