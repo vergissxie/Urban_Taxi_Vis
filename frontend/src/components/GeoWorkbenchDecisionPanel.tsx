@@ -588,7 +588,7 @@ export default function GeoWorkbenchDecisionPanel({
                         key={key}
                         type="button"
                         onClick={() => setF8SortMode(key as F8SortMode)}
-                        disabled={parameterLocked}
+                        disabled={f8Loading}
                         className={`min-w-0 px-1.5 py-2 text-center text-[8px] font-semibold leading-tight whitespace-nowrap transition disabled:cursor-not-allowed disabled:opacity-60 ${index > 0 ? 'border-l border-slate-700/70' : ''} ${f8SortMode === key ? 'bg-slate-200/12 text-slate-50' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}
                       >
                         {label}
@@ -721,7 +721,7 @@ export default function GeoWorkbenchDecisionPanel({
                         key={item.key}
                         type="button"
                         onClick={() => setF9Strategy(item.key)}
-                        disabled={parameterLocked}
+                        disabled={f8Loading}
                         className={`rounded-xl border px-3 py-2.5 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${f9Strategy === item.key ? 'border-cyan-300/26 bg-cyan-300/10 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.08)]' : 'border-slate-700/70 bg-[#111826] hover:border-slate-600/80'}`}
                       >
                         <div className="flex items-center gap-2 text-cyan-200">

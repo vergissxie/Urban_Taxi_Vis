@@ -25,7 +25,7 @@ export const BEIJING_CORE_BBOX = {
 export const analysisEntries: AnalysisEntry[] = [
   { mode: 'trajectory', title: '基础轨迹检索 (F1-F2)', description: '车辆轨迹查询、抽稀回放与路网匹配对比', icon: Route },
   { mode: 'region', title: '区域与网格态势 (F3-F6)', description: '框选统计、栅格热力、OD 流向与核心区诊断', icon: AreaChart },
-  { mode: 'decision', title: 'Frequent Paths & Recommendations (F7-F9)', description: 'Frequent roads, A/B routes, and strategy ranking', icon: Sparkles },
+  { mode: 'decision', title: '高频路径与策略推荐 (F7-F9)', description: '高频道路、A/B 路线与策略排序', icon: Sparkles },
 ];
 
 export const regionToolEntries: RegionToolEntry[] = [

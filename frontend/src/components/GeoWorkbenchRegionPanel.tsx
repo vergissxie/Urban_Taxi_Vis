@@ -276,7 +276,7 @@ export default function GeoWorkbenchRegionPanel(props: GeoWorkbenchRegionPanelPr
                     <div className="rounded-sm border border-cyan-300/18 bg-[#0f1622]/90 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]">
                       <div className="text-[11px] font-medium text-slate-500">命中车辆</div>
                       <div className="mt-2 whitespace-nowrap text-3xl font-semibold leading-none tracking-tight text-cyan-100">
-                        {status === 'ready' ? formatInt(activeVehicles) : f3Loading ? '...' : '--'}
+                        {f3Loading ? '...' : (status === 'ready' || f3RowsLength > 0) ? formatInt(activeVehicles) : '--'}
                       </div>
                     </div>
 
@@ -383,8 +383,8 @@ export default function GeoWorkbenchRegionPanel(props: GeoWorkbenchRegionPanelPr
 
                       <div className="mt-5 border-t border-slate-800/90 pt-4">
                         <div className="flex rounded-xl bg-[#101722] p-1">
-                          <button type="button" onClick={() => onSetF4RenderMode('heatmap')} disabled={parameterLocked} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f4RenderMode === 'heatmap' ? 'bg-[#1f4654] text-cyan-50 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.16)]' : 'text-slate-400 hover:text-slate-200'}`}>模糊热力图</button>
-                          <button type="button" onClick={() => onSetF4RenderMode('choropleth')} disabled={parameterLocked} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f4RenderMode === 'choropleth' ? 'bg-[#1f4654] text-cyan-50 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.16)]' : 'text-slate-400 hover:text-slate-200'}`}>离散色块图</button>
+                          <button type="button" onClick={() => onSetF4RenderMode('heatmap')} disabled={status === 'computing' || f4Generating} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f4RenderMode === 'heatmap' ? 'bg-[#1f4654] text-cyan-50 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.16)]' : 'text-slate-400 hover:text-slate-200'}`}>模糊热力图</button>
+                          <button type="button" onClick={() => onSetF4RenderMode('choropleth')} disabled={status === 'computing' || f4Generating} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f4RenderMode === 'choropleth' ? 'bg-[#1f4654] text-cyan-50 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.16)]' : 'text-slate-400 hover:text-slate-200'}`}>离散色块图</button>
                         </div>
 
                         {f4RenderMode === 'choropleth' ? (
@@ -394,7 +394,7 @@ export default function GeoWorkbenchRegionPanel(props: GeoWorkbenchRegionPanelPr
                               { key: 'jenks', label: '自然断点' },
                               { key: 'equal', label: '等距分段' },
                             ].map((item) => (
-                              <button key={item.key} type="button" onClick={() => onSetF4ClassifyMethod(item.key as 'quantile' | 'jenks' | 'equal')} disabled={parameterLocked} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-2 py-2 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f4ClassifyMethod === item.key ? 'bg-cyan-300/12 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.16)]' : 'text-slate-400 hover:text-slate-200'}`}>
+                              <button key={item.key} type="button" onClick={() => onSetF4ClassifyMethod(item.key as 'quantile' | 'jenks' | 'equal')} disabled={status === 'computing' || f4Generating} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-2 py-2 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f4ClassifyMethod === item.key ? 'bg-cyan-300/12 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(103,232,249,0.16)]' : 'text-slate-400 hover:text-slate-200'}`}>
                                 {item.label}
                               </button>
                             ))}
@@ -570,8 +570,8 @@ export default function GeoWorkbenchRegionPanel(props: GeoWorkbenchRegionPanelPr
                         </div>
                       </div>
                       <div className="mt-2 flex rounded-xl bg-[#101722] p-1">
-                        <button type="button" onClick={() => onSetF6AnalysisMode('strict_od')} disabled={parameterLocked} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f6AnalysisMode === 'strict_od' ? 'bg-blue-400/14 text-blue-100' : 'text-slate-400 hover:text-slate-200'}`}>严格起终点 OD</button>
-                        <button type="button" onClick={() => onSetF6AnalysisMode('through_flow')} disabled={parameterLocked} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f6AnalysisMode === 'through_flow' ? 'bg-orange-400/14 text-orange-100' : 'text-slate-400 hover:text-slate-200'}`}>途经流向</button>
+                        <button type="button" onClick={() => onSetF6AnalysisMode('strict_od')} disabled={status === 'computing'} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f6AnalysisMode === 'strict_od' ? 'bg-blue-400/14 text-blue-100' : 'text-slate-400 hover:text-slate-200'}`}>严格起终点 OD</button>
+                        <button type="button" onClick={() => onSetF6AnalysisMode('through_flow')} disabled={status === 'computing'} className={`min-w-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${f6AnalysisMode === 'through_flow' ? 'bg-orange-400/14 text-orange-100' : 'text-slate-400 hover:text-slate-200'}`}>途经流向</button>
                       </div>
                     </div>
 
