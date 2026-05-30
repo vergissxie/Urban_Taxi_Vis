@@ -7,11 +7,13 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@tailwindcss/vite": "^4.1.7",
     "@vitejs/plugin-react": "^4.4.1",
     "antd": "^5.25.0",
     "axios": "^1.9.0",
     "dayjs": "^1.11.13",
+    "gsap": "^3.15.0",
     "h3-js": "^4.2.1",
     "lucide-react": "^0.511.0",
     "react": "^18.3.1",

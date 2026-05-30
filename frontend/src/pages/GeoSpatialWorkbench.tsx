@@ -75,7 +75,7 @@ import {
 import type { AssistantAction } from '../services/assistantService';
 import readonlyFixture from '../demo/readonlyFixture.json';
 
-type WorkbenchMode = 'overview' | 'trajectory' | 'region' | 'decision';
+export type WorkbenchMode = 'overview' | 'trajectory' | 'region' | 'decision';
 type ComputeStatus = 'idle' | 'computing' | 'ready' | 'empty' | 'error';
 type BrushMode = 'none' | 'areaA' | 'areaB';
 type MapStyleKey = 'darkblue' | 'dark' | 'normal';
@@ -1227,7 +1227,11 @@ function getBoundsFromF4Cells(cells: F4GridCell[]) {
   return { minLon, minLat, maxLon, maxLat };
 }
 
-export default function GeoSpatialWorkbench() {
+interface GeoSpatialWorkbenchProps {
+  initialMode?: WorkbenchMode;
+}
+
+export default function GeoSpatialWorkbench({ initialMode = 'overview' }: GeoSpatialWorkbenchProps) {
   const { amap, sdkStatus, sdkError } = useAmapSdk();
   const mapContainerRef = React.useRef<HTMLDivElement | null>(null);
   const mapRef = React.useRef<any | null>(null);
@@ -1304,7 +1308,7 @@ export default function GeoSpatialWorkbench() {
   }>({ rafId: null, tripId: null, startedAt: 0, elapsedMs: 0, durationMs: 0, fullPath: [], pathLengths: [] });
   const [mapReady, setMapReady] = React.useState(false);
   const [viewportRevision, setViewportRevision] = React.useState(0);
-  const [mode, setMode] = React.useState<WorkbenchMode>('overview');
+  const [mode, setMode] = React.useState<WorkbenchMode>(initialMode);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [queryTimeRange, setQueryTimeRange] = React.useState<[number, number]>([0, 100]);
   const [displayedTimeRange, setDisplayedTimeRange] = React.useState<[number, number]>([0, 100]);
